@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from .Models import SalarieModel
 class Posts(models.Model):
 
     title = models.CharField(max_length=250)
