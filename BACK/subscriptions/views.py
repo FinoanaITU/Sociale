@@ -13,3 +13,9 @@ class PostView(generics.RetrieveAPIView):
         querySet = self.get_queryset()
         serializer = PostSerializer(querySet, many=True)
         return Response(serializer.data)
+
+class SalarieView():
+    permission_classes = (IsAuthenticated,)
+    def ajoutIdentification(request):
+        print(request)
+        

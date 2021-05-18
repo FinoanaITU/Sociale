@@ -1,12 +1,17 @@
 from django.db import models
 from django.db.models.base import Model
-
-
+from .SocieteModel import Societe
 class EtapeCreationSalarie(models.Model):
     identification = models.BooleanField(default=False)
     coordonnees = models.BooleanField(default=False)
     bancaire = models.BooleanField(default=False)
     emploi = models.BooleanField(default=False)
+
+    def status(self):
+        if self.identification and self.coordonnees and self.bancaire and self.emploi:
+            return True
+        else:
+            return False
 
 class Identification(models.Model):
     nom_salarie = models.CharField(max_length=50,null=False)
@@ -19,6 +24,9 @@ class Identification(models.Model):
     date_naissance = models.DateField(null=False)
     pay_naissance = models.TextField(max_length=50,null=True)
     commune_naissance = models.TextField(max_length=50,null=True)
+
+    def __str__(self):
+        return self.nom_salarie
 
 class Emploi(models.Model):
     nature_emploi = models.CharField(max_length=50,null=False)
@@ -33,6 +41,9 @@ class Emploi(models.Model):
     salaire_brute = models.FloatField(null=False)
     type_salaire = models.TextChoices('Mensuel','Horaire')
     heure_normale = models.FloatField(null=False)
+
+    def __str__(self):
+        return self.nature_emploi
 
 
 class Coordonnees(models.Model):
@@ -52,7 +63,11 @@ class Coordonnees(models.Model):
     email_salarie = models.EmailField(max_length=100)
 
 
+    def __str__(self):
+        return self.voie
+
 class Salarie (models.Model):
+    societe = models.ForeignKey(Societe, on_delete=models.CASCADE)
     etape_creation = models.OneToOneField(EtapeCreationSalarie,null=True,on_delete=models.CASCADE)
     identification = models.OneToOneField(Identification,null=True,on_delete=models.CASCADE)
     coordonnees = models.OneToOneField(Coordonnees,null=True,on_delete=models.CASCADE)
@@ -67,3 +82,6 @@ class InformationBancaire(models.Model):
     virement = models.BooleanField(default=False)
     plafond = models.FloatField(null=True)
     salarie = models.ForeignKey(Salarie,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.salarie

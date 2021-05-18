@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils.translation import activate
 from .Models import SalarieModel
+from .Models import SocieteModel
 class Posts(models.Model):
 
     title = models.CharField(max_length=250)
