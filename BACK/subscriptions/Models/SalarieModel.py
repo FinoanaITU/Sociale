@@ -14,13 +14,15 @@ class EtapeCreationSalarie(models.Model):
             return False
 
 class Identification(models.Model):
+    choice_situation_familiale = models.TextChoices('Marié','Célibataire')
+
     nom_salarie = models.CharField(max_length=50,null=False)
     prenom_salarie = models.CharField(max_length=50,null=False)
     nom_maritale = models.CharField(max_length=50,null=True)
     matricule = models.CharField(max_length=50,null=True)
     matricule_interne = models.CharField(max_length=50,null=True)
     nir = models.CharField(max_length=15,null=False)
-    situation_familiale = models.TextChoices('Marié','Célibataire')
+    situation_familiale = models.CharField(blank=True, choices=choice_situation_familiale.choices, max_length=15)
     date_naissance = models.DateField(null=False)
     pay_naissance = models.TextField(max_length=50,null=True)
     commune_naissance = models.TextField(max_length=50,null=True)
@@ -29,8 +31,11 @@ class Identification(models.Model):
         return self.nom_salarie
 
 class Emploi(models.Model):
+    choice_type_contrat = models.TextChoices('CDI','CDD')
+    choice_type_salaire = models.TextChoices('Mensuel','Horaire')
+
     nature_emploi = models.CharField(max_length=50,null=False)
-    type_contrat = models.TextField('CDI','CDD')
+    type_contrat = models.CharField(blank=True, choices=choice_type_contrat.choices, max_length=3)
     duree_mois = models.SmallIntegerField(null=True)
     duree_jours = models.SmallIntegerField(null=True)
     date_debut_emploi = models.DateField(null=False)
@@ -39,7 +44,7 @@ class Emploi(models.Model):
     motif_fin_emploi = models.TextField(max_length=250,null=True)
     code_metier = models.TextField(max_length=10,null=True)
     salaire_brute = models.FloatField(null=False)
-    type_salaire = models.TextChoices('Mensuel','Horaire')
+    type_salaire = models.CharField(blank=True, choices=choice_type_salaire.choices, max_length=10)
     heure_normale = models.FloatField(null=False)
 
     def __str__(self):
@@ -59,7 +64,6 @@ class Coordonnees(models.Model):
     tel_bureau = models.TextField(max_length=20,null=True)
     tel_portable = models.TextField(max_length=20,null=True)
     tel_portable_pros = models.TextField(max_length=20,null=True)
-    tel_domicile = models.TextField(max_length=20,null=True)
     email_salarie = models.EmailField(max_length=100)
 
 
@@ -67,11 +71,11 @@ class Coordonnees(models.Model):
         return self.voie
 
 class Salarie (models.Model):
-    societe = models.ForeignKey(Societe, on_delete=models.CASCADE)
+    societe = models.ForeignKey(Societe, on_delete=models.DO_NOTHING,null=True)
     etape_creation = models.OneToOneField(EtapeCreationSalarie,null=True,on_delete=models.CASCADE)
     identification = models.OneToOneField(Identification,null=True,on_delete=models.CASCADE)
     coordonnees = models.OneToOneField(Coordonnees,null=True,on_delete=models.CASCADE)
-    empoi = models.OneToOneField(Emploi,null=True,on_delete=models.CASCADE)
+    emploi = models.OneToOneField(Emploi,null=True,on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
