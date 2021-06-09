@@ -48,12 +48,13 @@ class GestionSalarie():
                     upEtape.emploi = True
                 result = upEtape
             except Exception as e:
-                print(e)  
+                print(e)
+        result.save()  
         return result
 
     def ajoutIdentification(self,data):
         result = False
-        salarie = self.checkSalarie(8)
+        salarie = self.checkSalarie(data['idSalarie'])
         if (salarie == None) or (salarie != None and salarie.identification == None):
             try:
                 identifaction = Identification.objects.create(
@@ -67,9 +68,10 @@ class GestionSalarie():
                     date_naissance = data['dateNaissance'],
                     pay_naissance = data['paysNaissance'],
                     commune_naissance = data['departementNaissance'],
+                    sexe= data['sexe']
                 )
                 print(self.societe,'ato-------------------')
-                newSalarier = Salarie()
+                newSalarier = Salarie() if salarie == None else salarie
                 newSalarier.identification = identifaction
                 newSalarier.societe = self.societe
                 etape = self.majEtape(newSalarier,'identification')
@@ -78,6 +80,7 @@ class GestionSalarie():
                 result = True
             except Exception as e:
                 print(e)
+                result = str(e)
         else:
             result = self.updateIdentification(salarie,data)
         
@@ -97,6 +100,7 @@ class GestionSalarie():
             upIdentification.date_naissance = data['dateNaissance']
             upIdentification.pay_naissance = data['paysNaissance']
             upIdentification.commune_naissance = data['departementNaissance']
+            upIdentification.sexe = data['sexe']
             upIdentification.save()
             etape = self.majEtape(salarie,'identification')
             salarie.etape_creation = etape
@@ -104,6 +108,7 @@ class GestionSalarie():
             result = True
         except Exception as e:
             print(e)
+            result = str(e)
 
         return result
 
@@ -111,7 +116,7 @@ class GestionSalarie():
     
     def ajoutCoordonnees(self,data):
         resultat = False
-        salarie = self.checkSalarie(9)
+        salarie = self.checkSalarie(data['idSalarie'])
         if (salarie == None) or (salarie != None and salarie.coordonnees == None):
             print('ato------------')
             try:
@@ -130,7 +135,7 @@ class GestionSalarie():
                     tel_portable_pros = data['telPortablePro'],
                     email_salarie = data['email'],
                 )
-                newSalarier = Salarie()
+                newSalarier = Salarie() if salarie == None else salarie
                 newSalarier.coordonnees = coordonne
                 newSalarier.societe = self.societe
                 etape = self.majEtape(newSalarier,'coordonnees')
@@ -139,6 +144,7 @@ class GestionSalarie():
                 resultat = True
             except Exception as e:
                 print(e)
+                result = str(e)
         else:
             resultat = self.updateCoordonnees(salarie,data)            
         return resultat
@@ -161,18 +167,22 @@ class GestionSalarie():
             upCoordonenee.tel_portable_pros = data['telPortablePro']
             upCoordonenee.email_salarie = data['email']
             upCoordonenee.save()
+            etape = self.majEtape(salarie,'coordonnees')
+            print(etape.coordonnees,'test')
+            salarie.etape_creation = etape
+            salarie.save()
             result = True
         except Exception as e:
             print(e)
+            result = str(e)
 
         return result
 
 
     def ajoutEmploi(self,data):
         resultat = False
-        salarie = self.checkSalarie(10)
+        salarie = self.checkSalarie(data['idSalarie'])
         if (salarie == None) or (salarie != None and salarie.emploi == None):
-            print(data)
             try:
                 emploi = Emploi.objects.create(
                     nature_emploi = data['nature'],
@@ -188,7 +198,7 @@ class GestionSalarie():
                     type_salaire = data['salaireType'],
                     heure_normale = data['heureMensuellees'],
                 )
-                newSalarier = Salarie()
+                newSalarier = Salarie() if salarie == None else salarie
                 newSalarier.emploi = emploi
                 newSalarier.societe = self.societe
                 etape = self.majEtape(newSalarier,'infoEmploi')
@@ -197,6 +207,7 @@ class GestionSalarie():
                 resultat = True
             except Exception as e:
                 print(e)
+                result = str(e)
         else:
             resultat = self.updateEmploi(salarie,data)            
         return resultat
@@ -204,7 +215,6 @@ class GestionSalarie():
     def updateEmploi(self,salarie,data):
         result = False
         upEmploi = salarie.emploi
-        print('update')
         try:
             upEmploi.nature_emploi = data['nature']
             upEmploi.type_contrat = data['codeContrat']
@@ -218,18 +228,23 @@ class GestionSalarie():
             upEmploi.salaire_brute = data['salaireBase']
             upEmploi.type_salaire = data['salaireType']
             upEmploi.heure_normale = data['heureMensuellees']
+            etape = self.majEtape(salarie,'infoEmploi')
             upEmploi.save()
+            salarie.etape_creation = etape
+            salarie.save()
             result = True
         except Exception as e:
             print(e)
+            result = str(e)
 
         return result
 
-    def ajoutInfoBank(self,data):
+    def ajoutInfoBank(self,data,idSalarie):
         resultat = False
-        salarie = self.checkSalarie(10)
+        print(data)
+        salarie = self.checkSalarie(idSalarie)
         if salarie != None:
-            infoBank = InformationBancaire.objects.filter(salarie= 10)
+            infoBank = InformationBancaire.objects.filter(salarie_id= idSalarie)
             if len(infoBank) == 0:
                 print(salarie)
                 for bankList in data:
@@ -246,28 +261,56 @@ class GestionSalarie():
                         resultat = True
                     except Exception as e:
                         print(e)
+                        resultat = str(e)
+                salarie.etape_creation = self.majEtape(salarie,'infoBank')
+                salarie.save()
             else:
-                resultat = self.updateInfoBank(infoBank,data)
+                infoBank.delete()
+                resultat = self.ajoutInfoBank(data,idSalarie)
         else:
             resultat = {'error':"veuiller completer d'abord les autres information"}       
         return resultat
-        
-    def updateInfoBank(self,infoBank,data):
-        result = False
-        print('ato------------------')
-        print(infoBank,'update')
-        # for e in infoBank:
-        #     print(e.__meta)
-        # try:
-        #     for bankList in data:
-        #         infoBank.bic = bankList['BIC']
-        #         infoBank.iban = bankList['IBAN']
-        #         infoBank.rib = bankList['RIB']
-        #         infoBank.virement = bankList['virement']
-        #         infoBank.plafond = bankList['plafond']
-        #         infoBank.save()
-        #         result = True
-        # except Exception as e:
-        #     print(e)
+
+    def getInfoBAnk(self, idSalarie):
+        infoBank = InformationBancaire.objects.filter(salarie_id=idSalarie)
+        data = []
+        if len(infoBank) > 0:
+            for info in infoBank:
+                ob = {
+                    'RIB': info.rib,
+                    'IBAN': info.iban,
+                    'BIC': info.bic,
+                    'virement': info.virement,
+                    'plafond': info.plafond,
+                }
+                data.append(ob)
+        else:
+            data = None
+        return data
+
+    def recuperationAllInfoSalarie(self,idSalarie):
+        salarie = self.checkSalarie(idSalarie)
+        infoBank = self.getInfoBAnk(idSalarie)
+        coorodonnes = salarie.coordonnees.getCoordonnees() if salarie.coordonnees != None else None
+        identification = salarie.identification.getIdentification() if salarie.identification != None else None
+        emploi = salarie.emploi.getEmploi() if salarie.emploi != None else None
+        etape = salarie.etape_creation.status() if salarie.etape_creation != None else None
+        allData = {
+            'coordonnees': coorodonnes,
+            'identification': identification,
+            'emploi': emploi,
+            'etapeCreation': etape,
+            'infoBank':infoBank,
+            'salarieRecap':salarie.getSalarie()
+        }
+        return allData
+
+    def getAllSalarie(self,idSociete):
+        result = []
+        allSalarie = Salarie.objects.filter(societe_id = idSociete)
+        if len(allSalarie) > 0:
+            for i,salarie in enumerate(allSalarie):
+                result.append(salarie.getSalarie())
 
         return result
+                

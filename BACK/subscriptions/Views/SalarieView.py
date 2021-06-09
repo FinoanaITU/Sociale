@@ -9,8 +9,7 @@ class SalarieView():
         data = json.loads(request.body)
         gestion = GestionSalarie()
         response = gestion.ajoutIdentification(data['data'])
-        print(response)
-        return JsonResponse({"message":'ok'})
+        return JsonResponse({"message":response})
 
     @csrf_exempt
     def coordonneeAction(request):
@@ -18,7 +17,7 @@ class SalarieView():
         gestion = GestionSalarie()
         response = gestion.ajoutCoordonnees(data['data'])
         print(response)
-        return JsonResponse({"message":'ok'})
+        return JsonResponse({"message":response})
 
     @csrf_exempt
     def emploiAction(request):
@@ -26,12 +25,28 @@ class SalarieView():
         gestion = GestionSalarie()
         response = gestion.ajoutEmploi(data['data'])
         print(response)
-        return JsonResponse({"message":'ok'})
+        return JsonResponse({"message":response})
 
     @csrf_exempt
     def infoBankAction(request):
         data = json.loads(request.body)
         gestion = GestionSalarie()
-        response = gestion.ajoutInfoBank(data['data'])
-        print(response)
-        return JsonResponse({"message":'ok'})
+        print(data)
+        response = gestion.ajoutInfoBank(data['data'],data['idSalarie'])
+        return JsonResponse({"message":response})
+
+    @csrf_exempt
+    def allInfoSalarieAction(request):
+        data = json.loads(request.body)
+        gestion = GestionSalarie()
+        response = gestion.recuperationAllInfoSalarie(data['data']['idSalarie'])
+        return JsonResponse(response)
+
+    @csrf_exempt
+    def allSalarieAction(request):
+        data = json.loads(request.body)
+        gestion = GestionSalarie()
+        response = gestion.getAllSalarie(data['idSociete'])
+        print(type(response))
+        jsonData = json.dumps(response)
+        return JsonResponse(jsonData,safe=False)

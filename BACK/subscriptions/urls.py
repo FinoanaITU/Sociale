@@ -10,5 +10,7 @@ urlpatterns = [
     path('gestion-salarie/ajout-identifiant', SalarieView.identificationAction, name='ajout_identification'),
     path('gestion-salarie/ajout-coordonee', SalarieView.coordonneeAction, name='ajout_coordoonee'),
     path('gestion-salarie/ajout-emploi', SalarieView.emploiAction, name='ajout_emploi'),
-    path('gestion-salarie/ajout-infoBank', SalarieView.infoBankAction, name='ajout_infoBank')
+    path('gestion-salarie/ajout-infoBank', SalarieView.infoBankAction, name='ajout_infoBank'),
+    path('gestion-salarie/all-infoSalarie', SalarieView.allInfoSalarieAction, name='get_all_infoSalarie'),
+    path('gestion-salarie/all-Salarie', SalarieView.allSalarieAction, name='get_all_Salarie')
 ]

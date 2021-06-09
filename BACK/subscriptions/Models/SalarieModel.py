@@ -15,9 +15,11 @@ class EtapeCreationSalarie(models.Model):
 
 class Identification(models.Model):
     choice_situation_familiale = models.TextChoices('Marié','Célibataire')
+    choice_sexe = models.TextChoices('Masculin','Feminin')
 
     nom_salarie = models.CharField(max_length=50,null=False)
     prenom_salarie = models.CharField(max_length=50,null=False)
+    sexe = models.CharField(blank=True, choices=choice_sexe.choices, max_length=10)
     nom_maritale = models.CharField(max_length=50,null=True)
     matricule = models.CharField(max_length=50,null=True)
     matricule_interne = models.CharField(max_length=50,null=True)
@@ -29,6 +31,21 @@ class Identification(models.Model):
 
     def __str__(self):
         return self.nom_salarie
+
+    def getIdentification (self):
+        return {
+            'nomDeNaissance': self.nom_salarie,
+            'prenom': self.prenom_salarie,
+            'nomMarital': self.nom_maritale,
+            'sexe': self.sexe,
+            'matricule': self.matricule,
+            'matriculeInterne': self.matricule_interne,
+            'nir': self.nir,
+            'situationFamiliale': self.situation_familiale,
+            'dateNaissance': self.date_naissance,
+            'paysNaissance': self.pay_naissance,
+            'departementNaissance': self.commune_naissance,
+        }
 
 class Emploi(models.Model):
     choice_type_contrat = models.TextChoices('CDI','CDD')
@@ -50,6 +67,21 @@ class Emploi(models.Model):
     def __str__(self):
         return self.nature_emploi
 
+    def getEmploi (self):
+        return {
+        'nature':self.nature_emploi,
+        'codeContrat':self.type_contrat,
+        'dureeInitialeCDDMois':self.duree_mois,
+        'dureeInitialeCDDJours':self.duree_jours,
+        'dateDebut':self.date_debut_emploi,
+        'motifDebut':self.motif_debut_emploi,
+        'dateFin':self.date_fin_emploi,
+        'motifFin':self.motif_fin_emploi,
+        'code_metier':self.code_metier,
+        'salaireBase':self.salaire_brute,
+        'salaireType':self.type_salaire,
+        'heureMensuellees':self.heure_normale,
+    }
 
 class Coordonnees(models.Model):
     voie = models.TextField(max_length=50,null=True)
@@ -70,6 +102,22 @@ class Coordonnees(models.Model):
     def __str__(self):
         return self.voie
 
+    def getCoordonnees (self):
+        return {
+            'voie':self.voie,
+            'complement':self.complement,
+            'codePostal':self.code_postale,
+            'codeVille':self.ville_salarie,
+            'address_salarie':self.address_salarie,
+            'horsFrance':self.hors_france_salarie,
+            'pays':self.pays_code_salarie,
+            'paysNom':self.pays_nom_salarie,
+            'telDomicile':self.tel_domicile,
+            'telBureau':self.tel_bureau,
+            'telPortable':self.tel_portable,
+            'telPortablePro':self.tel_portable_pros,
+            'email':self.email_salarie,
+        }
 class Salarie (models.Model):
     societe = models.ForeignKey(Societe, on_delete=models.DO_NOTHING,null=True)
     etape_creation = models.OneToOneField(EtapeCreationSalarie,null=True,on_delete=models.CASCADE)
@@ -79,6 +127,29 @@ class Salarie (models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def getSalarie (self):
+        result = ''
+        if self.identification != None:
+            info = self.identification.getIdentification()
+            result = {
+                'idSalarie': self.id,
+                'nom': info['nomMarital'] if info['nomMarital'] != '' else info['nomDeNaissance'],
+                'prenom': info['prenom'],
+                'matricule': info['matricule'],
+                'dateEntrer': str(self.created_at.date()),
+                'statusCreation': self.etape_creation.status() if self.etape_creation != None else False
+            }
+        else:
+            result = {
+                'idSalarie': self.id,
+                'nom': 'nouvelle salarie_'+str(self.id),
+                'prenom': '' ,
+                'matricule': '',
+                'dateEntrer': str(self.created_at.date()),
+                'statusCreation': self.etape_creation.status() if self.etape_creation != None else False
+            }
+        
+        return result
 class InformationBancaire(models.Model):
     rib = models.TextField(max_length=20,null=False)
     iban = models.TextField(max_length=20,null=False)
@@ -87,5 +158,3 @@ class InformationBancaire(models.Model):
     plafond = models.FloatField(null=True)
     salarie = models.ForeignKey(Salarie,on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.salarie
