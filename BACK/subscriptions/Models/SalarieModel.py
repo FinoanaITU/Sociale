@@ -48,11 +48,10 @@ class Identification(models.Model):
         }
 
 class Emploi(models.Model):
-    choice_type_contrat = models.TextChoices('CDI','CDD')
     choice_type_salaire = models.TextChoices('Mensuel','Horaire')
 
     nature_emploi = models.CharField(max_length=50,null=False)
-    type_contrat = models.CharField(blank=True, choices=choice_type_contrat.choices, max_length=3)
+    type_contrat = models.CharField(max_length=20, null=False)
     duree_mois = models.SmallIntegerField(null=True)
     duree_jours = models.SmallIntegerField(null=True)
     date_debut_emploi = models.DateField(null=False)
@@ -158,3 +157,11 @@ class InformationBancaire(models.Model):
     plafond = models.FloatField(null=True)
     salarie = models.ForeignKey(Salarie,on_delete=models.CASCADE)
 
+class Pieces(models.Model):
+    nom_piece = models.TextField(max_length=200, null=False)
+    salarie = models.ForeignKey(Salarie,on_delete=models.CASCADE)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nom_piece

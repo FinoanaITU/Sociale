@@ -314,3 +314,10 @@ class GestionSalarie():
 
         return result
                 
+    def ajoutPiece(self,files,idSalarie):
+        result = {}
+        salarie = self.checkSalarie(idSalarie)
+        if salarie != None:
+            pass
+        else:
+            result = {'error':'veuillez complete'}

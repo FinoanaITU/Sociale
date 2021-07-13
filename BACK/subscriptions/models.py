@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import activate
 from .Models import SalarieModel
 from .Models import SocieteModel
+from .Models import BulettinModel
 class Posts(models.Model):
 
     title = models.CharField(max_length=250)

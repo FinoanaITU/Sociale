@@ -1,5 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.http import JsonResponse, response
 from subscriptions.Source.GestionSalarie import GestionSalarie
 import json
 
@@ -47,6 +47,11 @@ class SalarieView():
         data = json.loads(request.body)
         gestion = GestionSalarie()
         response = gestion.getAllSalarie(data['idSociete'])
-        print(type(response))
         jsonData = json.dumps(response)
         return JsonResponse(jsonData,safe=False)
+
+    @csrf_exempt
+    def pieceJoint(request):
+        files = request.FILES['DSN']
+        gestion = GestionSalarie()
+        response = gestion.ajoutPiece(files)
