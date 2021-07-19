@@ -21,4 +21,6 @@ urlpatterns = [
     path('bulletin/liste-model', BulletinVue.listeModelBulletin, name='get_liste_model_bulletin'),
     path('bulletin/select-model', BulletinVue.selectModel, name='select_model_bulletin'),
     path('bulletin/all-motifs', BulletinVue.allMotif, name='all_motif'),
+    path('bulletin/add-modif-model', BulletinVue.addOrModifModel, name='add_modif_model'),
+    path('bulletin/remove-model', BulletinVue.removeModel, name='remove_model'),
 ]

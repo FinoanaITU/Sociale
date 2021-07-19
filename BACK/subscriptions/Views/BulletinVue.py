@@ -26,3 +26,17 @@ class BulletinVue():
         gestion = GestionModel(data['idSociete'])
         response = gestion.allMotif()
         return JsonResponse(response,safe=False)
+
+    @csrf_exempt
+    def addOrModifModel (request):
+        data = json.loads(request.body)
+        gestion = GestionModel(data['idSociete'])
+        response = gestion.addOrUpdateModel(data['nomModel'],data['data'])
+        return JsonResponse(response,safe=False)
+
+    @csrf_exempt
+    def removeModel (request):
+        data = json.loads(request.body)
+        gestion = GestionModel(data['idSociete'])
+        response = gestion.removeModel(data['nomModel'])
+        return JsonResponse(response,safe=False)
