@@ -18,7 +18,21 @@ class Motifs(models.Model):
 class BulletinModel(models.Model):
     societe = models.ForeignKey(Societe, on_delete = models.CASCADE)
     nom_model = models.CharField(max_length=100, null=True)
-    motifs = models.ManyToManyField(Motifs)
+    motifs = models.ManyToManyField(Motifs, through='ModelMotif')
 
     def __str__(self):
         return self.nom_model
+
+    def getModel (self):
+        return{
+            'id': self.id,
+            'societe': self.societe,
+            'nom_model': self.nom_model,
+            'motifs': self.motifs,
+        }
+
+class ModelMotif(models.Model):
+    model = models.ForeignKey(BulletinModel, on_delete= models.CASCADE)
+    motif = models.ForeignKey(Motifs, on_delete= models.CASCADE)
+    isHaut = models.BooleanField(default=False)
+    isBas = models.BooleanField(default=False)
